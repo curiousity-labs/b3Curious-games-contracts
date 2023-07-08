@@ -7,11 +7,11 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const { deployer } = await hre.getNamedAccounts();
     const { deploy } = hre.deployments;
     ;
-    const connectFour = await deploy('ConnectFour', {
+    const connectFour = await deploy('ConnectFourS', {
       from: deployer,
       log: true,
     });
-    await deploy('ConnectFourFactory', {
+    await deploy('ConnectFourSFactory', {
       from: deployer,
       args: [connectFour.address],
       log: true,

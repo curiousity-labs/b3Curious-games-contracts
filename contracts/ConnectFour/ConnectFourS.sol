@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.17;
 
-contract ConnectFour {
+contract ConnectFourS {
     /// @notice revert if caller isn't current team
     error NotYourTurn();
     /// @notice revert if column choice is invalid

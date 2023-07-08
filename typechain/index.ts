@@ -2,5 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 export type { ConnectFour } from "./ConnectFour";
+export type { ConnectFourS } from "./ConnectFourS";
+export type { ConnectFourSFactory } from "./ConnectFourSFactory";
 export * as factories from "./factories";
 export { ConnectFour__factory } from "./factories/ConnectFour__factory";
+export { ConnectFourS__factory } from "./factories/ConnectFourS__factory";
+export { ConnectFourSFactory__factory } from "./factories/ConnectFourSFactory__factory";
