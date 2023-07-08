@@ -82,7 +82,7 @@ contract ConnectFour {
     /**
      * @notice current team plays a turn
      * @param _gameId id of game
-     * @param column selected column for move
+     * @param columnIndex selected column for move
      */
     function makeMove(
         uint8 _gameId,
