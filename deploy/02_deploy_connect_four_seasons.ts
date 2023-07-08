@@ -23,5 +23,5 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   }
 };
 
+func.tags = ['ConnectFour_Seasons'];
 export default func;
-func.tags = ['ConnectFour-Seasons'];
