@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.17;
+import "hardhat/console.sol";
 
 contract ConnectFourS {
     /// @notice revert if caller isn't current team
@@ -8,13 +9,19 @@ contract ConnectFourS {
     error InvalidSelection();
     /// @notice revert if game has been completed
     error GameOver();
-    /// @notice emiited when game is created
 
+    address private owner;
+
+    /// @notice emiited when game is created
     event GameCreated(uint gameId, address teamOne, address teamTwo);
     /// @notice emitted after turn is successfully taken
     event TurnTaken(uint indexed gameId, address team, uint8 column);
     /// @notice emitted when game is complete
     event GameFinished(uint gameId, address winner);
+    /// @notice emitted when a new season starts
+    event SeasonStarted(uint seasonId);
+    /// @notice emitted when a season ends
+    event SeasonEnded(uint seasonId);
 
     /// @notice holds game data
     /// @param teamOne address of challenger
@@ -30,13 +37,29 @@ contract ConnectFourS {
         uint8[7][6] board;
     }
 
+    struct Season {
+        uint256 startTimestamp;
+        uint256 endTimestamp;
+        bool isActive;
+    }
+
     /// @notice Used as a counter for the next game index.
     /// @dev Initialised at 1 because it makes the first transaction slightly cheaper.
-    uint public gameId;
+    uint public gameId = 1;
+    /// @notice Used as a counter for the next season index.
+    uint public seasonId = 0;
 
     /// @notice An indexed list of games
     /// @dev This automatically generates a getter for us, which will return `Game.player1`, `Game.player2`, `Game.moves`, and `Game.finished` (the arrays are skipped)
     mapping(uint => Game) public getGame;
+    /// @notice An indexed list of seasons
+    /// @dev This automatically generates a getter for us, which will return `Game.player1`, `Game.player2`, `Game.moves`, and `Game.finished` (the arrays are skipped)
+    mapping(uint => Season) public seasons;
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not owner");
+        _;
+    }
 
     /// @notice prevent move if column is invalid
     modifier validColumn(uint8 column) {
@@ -56,6 +79,41 @@ contract ConnectFourS {
         _;
     }
 
+    modifier onlyParticipants(uint _gameId) {
+        Game storage game = getGame[_gameId];
+        require(msg.sender == game.teamOne || msg.sender == game.teamTwo);
+        _;
+    }
+
+    modifier onlyActiveSeason() {
+        require(seasons[seasonId].isActive, "Season not active");
+        _;
+    }
+
+    constructor() {
+        owner = msg.sender;
+    }
+
+    /**
+     * @notice start a new season
+     */
+    function startSeason() external onlyOwner {
+        require(!seasons[seasonId].isActive, "Season already active");
+        seasonId += 1;
+        seasons[seasonId] = Season(block.timestamp, 0, true);
+        emit SeasonStarted(seasonId);
+    }
+
+    /**
+     * @notice end the current season
+     */
+    function endSeason() external onlyOwner {
+        require(seasons[seasonId].isActive, "Season not active");
+        seasons[seasonId].isActive = false;
+        seasons[seasonId].endTimestamp = block.timestamp;
+        emit SeasonEnded(seasonId);
+    }
+
     /**
      * @notice challenge an address to a game of connect four
      * @param opponent challened
@@ -63,7 +121,7 @@ contract ConnectFourS {
      * @dev game id is increated each time a new game is created
      * @dev season is over when timer (soon to be added) is past
      */
-    function challenge(address opponent) external uniqueTeams(opponent) {
+    function challenge(address opponent) external onlyActiveSeason uniqueTeams(opponent) {
         uint8[7][6] memory newBoard;
         Game memory newGame = Game({
             teamOne: msg.sender,
@@ -73,10 +131,19 @@ contract ConnectFourS {
             board: newBoard
         });
         getGame[gameId] = newGame;
-
+        console.log("Game created with id: %d", gameId);
         emit GameCreated(gameId, msg.sender, opponent);
 
         gameId++;
+    }
+
+    /**
+     * @notice Abandons the singleton game of msg.sender, if it exists.
+     */
+    function forfeit(uint _gameId) external onlyParticipants(_gameId) {
+        Game storage game = getGame[_gameId];
+        game.winner = msg.sender == game.teamOne ? game.teamTwo : game.teamOne;
+        emit GameFinished(_gameId, game.winner);
     }
 
     /**
@@ -365,9 +432,23 @@ contract ConnectFourS {
         return false;
     }
 
+    /**
+     * @notice get game board
+     * @param _gameId id of game
+     * @return game board
+     */
     function getGameBoard(
         uint8 _gameId
     ) public view returns (uint8[7][6] memory) {
         return getGame[_gameId].board;
+    }
+
+    /**
+     * @notice transfer ownership of contract
+     * @param newOwner address of new owner
+     */
+    function transferOwnership(address newOwner) public onlyOwner {
+        require(newOwner != address(0), "Invalid new owner");
+        owner = newOwner;
     }
 }
