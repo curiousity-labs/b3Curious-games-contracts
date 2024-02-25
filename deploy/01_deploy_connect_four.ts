@@ -7,7 +7,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const { deployer } = await hre.getNamedAccounts();
     const { deploy } = hre.deployments;
     ;
-    await deploy('ConnectFour', {
+    await deploy('ConnectFourS', {
       from: deployer,
       log: true,
     });
