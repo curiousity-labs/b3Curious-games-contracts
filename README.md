@@ -7,8 +7,8 @@
 | :---- | :---------- |
 | test | run `hardhat` tests |
 | compile | run `hardhat` compiler; also runs `typechain` compiler |
-| deploy:connectFour:goerli | deploys battleship factory and impl contracts to goerli network |
-| verify:goerli | verify deployed contracts on goerli network |
+| deploy:connectFour:sepolia | deploys battleship factory and impl contracts to goerli network |
+| verify:sepolia | verify deployed contracts on goerli network |
 
 ## Local Development
 

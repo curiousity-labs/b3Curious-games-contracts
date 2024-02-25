@@ -7,9 +7,8 @@
   "scripts": {
     "test": "REPORT_GAS=true hardhat test",
     "compile": "npm run clean && hardhat compile",
-    "deploy:connectFour:goerli": "pnpm run package:prep && hardhat deploy --network goerli --tags ConnectFour_Single --export ./minified/deployments.json",
-    "deploy:connectFourS:goerli": "pnpm run package:prep && hardhat deploy --network goerli --tags ConnectFour_Seasons --export ./minified/deployments.json",
-    "verify:goerli": "hardhat etherscan-verify --network goerli --solc-input",
+    "deploy:connectFour:sepolia": "pnpm run package:prep && hardhat deploy --network sepolia --tags ConnectFour_Single --export ./minified/deployments.json",
+    "verify:sepolia": "hardhat etherscan-verify --network sepolia --solc-input",
     "clean": "hardhat clean && rimraf dist && rimraf typechain",
     "package:prep": "pnpm run compile && tsc",
     "publish-packages": "pnpm run package:prep && pnpm publish --no-git-checks"
